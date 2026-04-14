@@ -1,0 +1,25 @@
+services:
+  backend: 
+    build: .
+    container_name: test-node
+    ports:
+      - 5000:5000
+    restart: unless-stopped
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - MONGO_URL=mongodb://mongodb:27017/shared_db
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:7
+    container_name: mongodb-server
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:

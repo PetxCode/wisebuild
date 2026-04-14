@@ -1,0 +1,9 @@
+services:
+  frontend-alpha:
+    build: .
+    container_name: react-alpha
+    ports:
+      - 5173:80
+    restart: unless-stopped
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro

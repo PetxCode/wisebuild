@@ -1,0 +1,57 @@
+services:
+  gateway:
+    image: nginx:stable-alpine
+    container_name: gateway-proxy
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx-gateway.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend-alpha
+      - frontend-beta
+      - backend
+    networks:
+      - app-network
+
+  frontend-alpha:
+    build:
+      context: ./frontend-alpha
+    container_name: frontend-alpha
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  frontend-beta:
+    build:
+      context: ./frontend-beta
+    container_name: frontend-beta
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  backend:
+    build:
+      context: ./backend
+    container_name: backend-api
+    restart: unless-stopped
+    environment:
+      - MONGO_URL=mongodb://mongodb:27017/shared_db
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+
+  mongodb:
+    image: mongo:7
+    container_name: mongodb-server
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
